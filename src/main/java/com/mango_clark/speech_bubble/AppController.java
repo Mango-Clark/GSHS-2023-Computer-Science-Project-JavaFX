@@ -21,10 +21,11 @@ public class AppController implements Initializable {
 	}
 
 	public void initializeImage() {
-		imageView.setImage(new Image(getClass().getResourceAsStream("/files/images/107852415_p4.png")));
+		imageView.setImage(new Image(getClass().getResourceAsStream("files/images/107852415_p4.png")));
 	}
 
 	public void menuBarRequest(ActionEvent event) {
+
 	}
 
 }
