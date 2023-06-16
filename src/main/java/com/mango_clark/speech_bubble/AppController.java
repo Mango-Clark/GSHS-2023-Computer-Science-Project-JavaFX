@@ -24,4 +24,7 @@ public class AppController implements Initializable {
 		imageView.setImage(new Image(getClass().getResourceAsStream("/files/images/107852415_p4.png")));
 	}
 
+	public void menuBarRequest(ActionEvent event) {
+	}
+
 }
