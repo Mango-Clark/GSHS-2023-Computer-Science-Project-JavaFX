@@ -73,21 +73,12 @@ public class App extends Application {
 		menuItem_Open = new MenuItem("Open");
 		menuItem_Open.setOnAction(event -> {
 			showImage();
+			File sourceFile = AppController.openImage(s);
 			try {
-				File sourceFile = AppController.openImage(s);
 				showImage(new FileInputStream(sourceFile));
-				try {
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				// String name = imageFile.toString();
-				// System.out.println(name);
-				// showImage(name);
-			} catch (NullPointerException exception) {
+			} catch (FileNotFoundException exception) {
 				exception.printStackTrace();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				System.out.println("Exception exception");
+				System.out.println("File not found: " + sourceFile.getAbsolutePath().toString());
 			}
 		});
 
