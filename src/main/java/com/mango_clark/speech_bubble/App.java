@@ -3,6 +3,7 @@ package com.mango_clark.speech_bubble;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 
+	final File settingsFile = new File(getClass().getResource("").getPath(), "files/settings.json");
 	BorderPane rootPane;
 	MenuBar menuBar;
 	ImageView imageView;
@@ -27,16 +29,24 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			Scene scene = initialScene();
-			showImage();
-			initializeMenuBar(primaryStage);
+			if (settingsFile.createNewFile()) {
+				System.out.println("Created settings file");
 
-			primaryStage.setTitle("Gs21079 - Paint Speech Bubble");
-			primaryStage.setScene(scene);
-			primaryStage.show();
-		} catch (Exception e) {
+			} else {
+				System.out.println("setting file Already existed");
+			}
+		} catch (IOException e) {
 			e.printStackTrace();
+			System.out.println("IOException");
 		}
+
+		Scene scene = initialScene();
+		showImage();
+		initializeMenuBar(primaryStage);
+
+		primaryStage.setTitle("Gs21079 - Paint Speech Bubble");
+		primaryStage.setScene(scene);
+		primaryStage.show();
 	}
 
 	public Scene initialScene() {
