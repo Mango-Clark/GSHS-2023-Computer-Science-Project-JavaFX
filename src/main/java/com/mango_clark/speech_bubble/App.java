@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
