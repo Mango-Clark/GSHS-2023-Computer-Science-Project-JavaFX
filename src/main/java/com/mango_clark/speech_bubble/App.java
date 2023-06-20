@@ -3,44 +3,35 @@ package com.mango_clark.speech_bubble;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javafx.application.Application;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class App extends Application {
-
-	final File settingsFile = new File(getClass().getResource("").getPath(), "files/settings.json");
 	BorderPane rootPane;
 	MenuBar menuBar;
-	ImageView imageView;
-	Image image;
 	Menu menu_File, menu_Help;
 	MenuItem menuItem_Open, menuItem_Save;
 	MenuItem menuItem_GitHub;
+	ImageView imageView;
+	Image image;
+	VBox vBox;
 
 	@Override
 	public void start(Stage primaryStage) {
-		try {
-			if (settingsFile.createNewFile()) {
-				System.out.println("Created settings file");
-
-			} else {
-				System.out.println("setting file Already existed");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("IOException");
-		}
-
 		Scene scene = initialScene();
 		showImage();
 		initializeMenuBar(primaryStage);
@@ -54,13 +45,17 @@ public class App extends Application {
 		menuBar = new MenuBar();
 
 		imageView = new ImageView();
-		imageView.prefHeight(400);
-		imageView.prefWidth(600);
+		imageView.prefHeight(Region.USE_COMPUTED_SIZE);
+		imageView.prefWidth(Region.USE_COMPUTED_SIZE);
 
 		rootPane = new BorderPane();
-		rootPane.setPrefSize(700, 500);
+		rootPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 		rootPane.setTop(menuBar);
-		rootPane.setLeft(imageView);
+		rootPane.setCenter(
+				new HBox(new Separator(Orientation.VERTICAL), imageView, new Separator(Orientation.VERTICAL)));
+		rootPane.setLeft(AppController.bubbleButtonVBox());
+		rootPane.setRight(AppController.bubbleAttributeVBox());
+		rootPane.setStyle("-fx-background-color: #dddddd");
 		return new Scene(rootPane);
 	}
 
