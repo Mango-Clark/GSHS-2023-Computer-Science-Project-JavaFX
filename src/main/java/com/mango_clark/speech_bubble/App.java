@@ -31,7 +31,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 	BorderPane rootPane;
-	AnchorPane imgAnchorPane = new AnchorPane();
+	AnchorPane imgAnchorPane;
 	MenuBar menuBar;
 	Menu menu_File, menu_Help;
 	MenuItem menuItem_Open, menuItem_Save;
@@ -40,17 +40,14 @@ public class App extends Application {
 	ImageView bubbleView;
 	Image bubbleImage;
 	Image image;
-
 	Slider xSlider;
 	Slider ySlider;
 
-	boolean bubble0Enabled = false;
+	boolean bubbleEnabled;
 
 	@Override
 	public void start(Stage primaryStage) {
 		Scene scene = initialScene(primaryStage);
-		showImage();
-		initializeMenuBar(primaryStage);
 
 		primaryStage.setTitle("Gs21079 - Paint Speech Bubble");
 		primaryStage.setScene(scene);
@@ -65,6 +62,11 @@ public class App extends Application {
 		imageView.prefWidth(Region.USE_COMPUTED_SIZE);
 		imageView.setPreserveRatio(true);
 
+		initializeBubble();
+		showImage();
+		initializeMenuBar(s);
+
+		imgAnchorPane = new AnchorPane();
 		imgAnchorPane.getChildren().setAll(imageView);
 
 		rootPane = new BorderPane();
@@ -84,12 +86,62 @@ public class App extends Application {
 
 	private void showImage(InputStream is) {
 		try {
-			image = new Image(is, 600.0, 400.0, true, true);
+			image = new Image(is, 1000.0, 700.0, true, true);
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			System.out.println("NullPointerException");
 		}
 		imageView.setImage(image);
+	}
+
+	private void initializeBubble() {
+		bubbleEnabled = false;
+		bubbleImage = new Image(new File("./").getAbsolutePath().toString()
+				+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/0.png");
+		bubbleView = new ImageView(bubbleImage);
+	}
+
+	private void toggleBubble() {
+		if (bubbleEnabled) {
+			hideBubble();
+		} else {
+			showBubble();
+		}
+	}
+
+	private void toggleBubble(int bubbleNum) {
+		if (bubbleEnabled) {
+			hideBubble();
+		} else {
+			showBubble(bubbleNum);
+		}
+	}
+
+	private void hideBubble() {
+		bubbleEnabled = false;
+		imgAnchorPane.getChildren().remove(bubbleView);
+		return;
+	}
+
+	private void showBubble() {
+		showBubble(0);
+	}
+
+	private void showBubble(int bubbleNum) {
+		String url = new File("./").getAbsolutePath().toString()
+				+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/" + bubbleNum + ".png";
+		try {
+			bubbleImage = new Image(url);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			System.out.println("NullPointerException");
+		}
+		if (bubbleEnabled) {
+		}
+		bubbleEnabled = true;
+		bubbleView.setImage(bubbleImage);
+		updateBubbleLayout();
+		imgAnchorPane.getChildren().add(bubbleView);
 	}
 
 	public void initializeMenuBar(Stage s) {
@@ -129,33 +181,23 @@ public class App extends Application {
 		vBox.setAlignment(Pos.TOP_CENTER);
 		vBox.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
 		vBox.setStyle("-fx-background-color: #ffffff;");
+		vBox.getChildren().addAll(bubbleButton(0));
+		return vBox;
+	}
 
+	private Button bubbleButton(int bubbleNum) {
 		ImageView view = new ImageView(new Image(
 				new File("./").getAbsolutePath().toString()
-						+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/0.png"));
+						+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/" + bubbleNum + ".png"));
 		view.setFitHeight(30);
 		view.setPreserveRatio(true);
-		Button btn1 = new Button();
-		btn1.setPrefWidth(35);
-		btn1.setGraphic(view);
-		btn1.setContentDisplay(ContentDisplay.TOP);
+		Button btn = new Button();
+		btn.setPrefWidth(35);
+		btn.setGraphic(view);
+		btn.setContentDisplay(ContentDisplay.TOP);
 
-		btn1.setOnAction(e -> {
-			if (bubble0Enabled) {
-				bubble0Enabled = false;
-				imgAnchorPane.getChildren().remove(bubbleView);
-				return;
-			}
-			bubble0Enabled = true;
-			bubbleImage = new Image(new File("./").getAbsolutePath().toString()
-					+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/0.png");
-			bubbleView = new ImageView(bubbleImage);
-			updateBubbleLayout();
-			imgAnchorPane.getChildren().add(bubbleView);
-		});
-
-		vBox.getChildren().addAll(btn1);
-		return vBox;
+		btn.setOnAction(e -> toggleBubble(bubbleNum));
+		return btn;
 	}
 
 	public VBox bubbleAttributeVBox(Stage s) {
@@ -220,9 +262,9 @@ public class App extends Application {
 	}
 
 	public void updateBubbleLayout() {
-		bubbleView.setLayoutX(xSlider.getValue() * (imageView.getFitWidth() - bubbleView.getFitWidth()));
-		bubbleView.setLayoutY(ySlider.getValue() * (imageView.getFitHeight() - bubbleView.getFitHeight()));
-		System.out.println(imageView.getFitWidth() - bubbleView.getFitWidth()); // bug
+		bubbleView.setLayoutX(xSlider.getValue() * imageView.getFitWidth());
+		bubbleView.setLayoutY(ySlider.getValue() * imageView.getFitHeight());
+		System.out.println(imageView.getFitWidth() - bubbleImage.getWidth()); // bug
 	}
 
 	public static void main(String[] args) {
