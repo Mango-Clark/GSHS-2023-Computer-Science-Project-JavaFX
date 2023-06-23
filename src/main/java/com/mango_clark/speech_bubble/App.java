@@ -32,7 +32,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -146,11 +145,13 @@ public class App extends Application {
 	}
 
 	public File openImage(Stage stage) {
-		FileChooser imageChooser = new FileChooser();
-		imageChooser.setTitle("get Image");
-		imageChooser.getExtensionFilters()
+		FileChooser imageFileChooser = new FileChooser();
+		imageFileChooser.setTitle("Open Image");
+		imageFileChooser.getExtensionFilters()
 				.add(new ExtensionFilter("그림파일 : Image Files", "*.png", "*.jpg", "*.gif", "*.bmp"));
-		return imageChooser.showOpenDialog(stage);
+		imageFileChooser.setInitialDirectory(new File(new File("").getAbsolutePath().toString()
+				+ "/src/main/java/com/mango_clark/speech_bubble/files/images"));
+		return imageFileChooser.showOpenDialog(stage);
 	}
 
 	private void initializeBubble() {
@@ -317,6 +318,8 @@ public class App extends Application {
 		saveFileChooser.setTitle("Save Image");
 		saveFileChooser.getExtensionFilters()
 				.add(new ExtensionFilter("그림파일 : Image Files", "*.png", "*.jpg", "*.gif", "*.bmp"));
+		saveFileChooser.setInitialDirectory(new File(new File("").getAbsolutePath().toString()
+				+ "/src/main/java/com/mango_clark/speech_bubble/files/images"));
 
 		WritableImage image = imgAnchorPane.snapshot(new SnapshotParameters(), null);
 		File file = saveFileChooser.showSaveDialog(s);
