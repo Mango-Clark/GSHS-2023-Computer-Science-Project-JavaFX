@@ -228,26 +228,6 @@ public class App extends Application {
 		ySliderHBox.getChildren().addAll(ySliderLabel, ySlider);
 
 		vBox.getChildren().setAll(xSliderHBox, ySliderHBox);
-
-		// Label heightSliderLabel = new Label("Height");
-		// heightSliderLabel.setFont(new Font("Consolas", 12));
-		// Slider heightSlider = new Slider(0.0, 1.0, 0.2);
-		// heightSlider.setBlockIncrement(0.01);
-		// HBox heightSliderHBox = new HBox();
-		// heightSliderHBox.setSpacing(10);
-		// heightSliderHBox.setAlignment(Pos.CENTER);
-		// heightSliderHBox.getChildren().addAll(heightSliderLabel, heightSlider);
-
-		// Label widthSliderLabel = new Label("Width_");
-		// widthSliderLabel.setFont(new Font("Consolas", 12));
-		// Slider widthSlider = new Slider(0.0, 1.0, 0.2);
-		// widthSlider.setBlockIncrement(0.01);
-		// HBox widthSliderHBox = new HBox();
-		// widthSliderHBox.setSpacing(10);
-		// widthSliderHBox.setAlignment(Pos.CENTER);
-		// widthSliderHBox.getChildren().addAll(widthSliderLabel, widthSlider);
-
-		// vBox.getChildren().addAll(widthSliderHBox, heightSliderHBox);
 		return vBox;
 	}
 
