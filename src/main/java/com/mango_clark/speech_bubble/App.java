@@ -329,7 +329,6 @@ public class App extends Application {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(file.getAbsolutePath());
 	}
 
 	public static void main(String[] args) {
