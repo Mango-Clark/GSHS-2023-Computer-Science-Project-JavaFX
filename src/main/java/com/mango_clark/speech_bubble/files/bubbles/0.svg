@@ -1,14 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="220" height="150">
-	<path d="M30 30
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="110">
+	<path d="M30 10
   h150
   c11 0 20 9 20 20
-  v60
+  v40
   c0 11-9 20 -20 20
   H80
   l-20 20-20-20
   H30
   c-11 0 -20 -9 -20 -20
-  V50
+  V30
   c0-11 9-20 20-20
   z" fill="#ffffff00" stroke="#000000" />
 </svg>

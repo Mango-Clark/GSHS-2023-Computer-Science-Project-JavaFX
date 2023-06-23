@@ -6,33 +6,49 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class App extends Application {
 	BorderPane rootPane;
+	AnchorPane imgAnchorPane = new AnchorPane();
 	MenuBar menuBar;
 	Menu menu_File, menu_Help;
 	MenuItem menuItem_Open, menuItem_Save;
 	MenuItem menuItem_GitHub;
 	ImageView imageView;
+	ImageView bubbleView;
+	Image bubbleImage;
 	Image image;
-	VBox vBox;
+
+	Slider xSlider;
+	Slider ySlider;
+
+	boolean bubble0Enabled = false;
 
 	@Override
 	public void start(Stage primaryStage) {
-		Scene scene = initialScene();
+		Scene scene = initialScene(primaryStage);
 		showImage();
 		initializeMenuBar(primaryStage);
 
@@ -41,20 +57,23 @@ public class App extends Application {
 		primaryStage.show();
 	}
 
-	public Scene initialScene() {
+	public Scene initialScene(Stage s) {
 		menuBar = new MenuBar();
 
 		imageView = new ImageView();
 		imageView.prefHeight(Region.USE_COMPUTED_SIZE);
 		imageView.prefWidth(Region.USE_COMPUTED_SIZE);
+		imageView.setPreserveRatio(true);
+
+		imgAnchorPane.getChildren().setAll(imageView);
 
 		rootPane = new BorderPane();
 		rootPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 		rootPane.setTop(menuBar);
 		rootPane.setCenter(
-				new HBox(new Separator(Orientation.VERTICAL), imageView, new Separator(Orientation.VERTICAL)));
-		rootPane.setLeft(AppController.bubbleButtonVBox());
-		rootPane.setRight(AppController.bubbleAttributeVBox());
+				new HBox(new Separator(Orientation.VERTICAL), imgAnchorPane, new Separator(Orientation.VERTICAL)));
+		rootPane.setLeft(bubbleButtonVBox(s));
+		rootPane.setRight(bubbleAttributeVBox(s));
 		rootPane.setStyle("-fx-background-color: #dddddd");
 		return new Scene(rootPane);
 	}
@@ -101,6 +120,109 @@ public class App extends Application {
 		menu_Help.getItems().addAll(menuItem_GitHub);
 
 		menuBar.getMenus().addAll(menu_File, menu_Help);
+	}
+
+	public VBox bubbleButtonVBox(Stage s) {
+		VBox vBox = new VBox();
+		vBox.setPrefWidth(40);
+		vBox.setSpacing(10);
+		vBox.setAlignment(Pos.TOP_CENTER);
+		vBox.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+		vBox.setStyle("-fx-background-color: #ffffff;");
+
+		ImageView view = new ImageView(new Image(
+				new File("./").getAbsolutePath().toString()
+						+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/0.png"));
+		view.setFitHeight(30);
+		view.setPreserveRatio(true);
+		Button btn1 = new Button();
+		btn1.setPrefWidth(35);
+		btn1.setGraphic(view);
+		btn1.setContentDisplay(ContentDisplay.TOP);
+
+		btn1.setOnAction(e -> {
+			if (bubble0Enabled) {
+				bubble0Enabled = false;
+				imgAnchorPane.getChildren().remove(bubbleView);
+				return;
+			}
+			bubble0Enabled = true;
+			bubbleImage = new Image(new File("./").getAbsolutePath().toString()
+					+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/0.png");
+			bubbleView = new ImageView(bubbleImage);
+			updateBubbleLayout();
+			imgAnchorPane.getChildren().add(bubbleView);
+		});
+
+		vBox.getChildren().addAll(btn1);
+		return vBox;
+	}
+
+	public VBox bubbleAttributeVBox(Stage s) {
+		VBox vBox = new VBox();
+		vBox.setSpacing(10);
+		vBox.setAlignment(Pos.CENTER);
+		vBox.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
+		vBox.setStyle("-fx-background-color: #ffffff;");
+
+		Label xSliderLabel = new Label("  X_  ");
+		xSliderLabel.setFont(new Font("Consolas", 12));
+		xSlider = new Slider(-0.05, 1.05, 0.2);
+		xSlider.setBlockIncrement(0.01);
+		xSlider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+				updateBubbleLayout();
+			}
+		});
+		HBox xSliderHBox = new HBox();
+		xSliderHBox.setSpacing(10);
+		xSliderHBox.setAlignment(Pos.CENTER);
+		xSliderHBox.getChildren().addAll(xSliderLabel, xSlider);
+
+		Label ySliderLabel = new Label("  Y_  ");
+		ySliderLabel.setFont(new Font("Consolas", 12));
+		ySlider = new Slider(-0.05, 1.05, 0.2);
+		ySlider.setBlockIncrement(0.01);
+		ySlider.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+				updateBubbleLayout();
+			}
+		});
+		HBox ySliderHBox = new HBox();
+		ySliderHBox.setSpacing(10);
+		ySliderHBox.setAlignment(Pos.CENTER);
+		ySliderHBox.getChildren().addAll(ySliderLabel, ySlider);
+
+		vBox.getChildren().setAll(xSliderHBox, ySliderHBox);
+
+		// Label heightSliderLabel = new Label("Height");
+		// heightSliderLabel.setFont(new Font("Consolas", 12));
+		// Slider heightSlider = new Slider(0.0, 1.0, 0.2);
+		// heightSlider.setBlockIncrement(0.01);
+		// HBox heightSliderHBox = new HBox();
+		// heightSliderHBox.setSpacing(10);
+		// heightSliderHBox.setAlignment(Pos.CENTER);
+		// heightSliderHBox.getChildren().addAll(heightSliderLabel, heightSlider);
+
+		// Label widthSliderLabel = new Label("Width_");
+		// widthSliderLabel.setFont(new Font("Consolas", 12));
+		// Slider widthSlider = new Slider(0.0, 1.0, 0.2);
+		// widthSlider.setBlockIncrement(0.01);
+		// HBox widthSliderHBox = new HBox();
+		// widthSliderHBox.setSpacing(10);
+		// widthSliderHBox.setAlignment(Pos.CENTER);
+		// widthSliderHBox.getChildren().addAll(widthSliderLabel, widthSlider);
+
+		// vBox.getChildren().addAll(widthSliderHBox, heightSliderHBox);
+		return vBox;
+	}
+
+	public void updateBubbleLayout() {
+		bubbleView.setLayoutX(xSlider.getValue() * (imageView.getFitWidth() - bubbleView.getFitWidth()));
+		bubbleView.setLayoutY(ySlider.getValue() * (imageView.getFitHeight() - bubbleView.getFitHeight()));
+		System.out.println(imageView.getFitWidth() - bubbleView.getFitWidth()); // bug
 	}
 
 	public static void main(String[] args) {
