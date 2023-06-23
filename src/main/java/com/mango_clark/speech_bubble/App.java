@@ -19,6 +19,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -27,9 +28,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class App extends Application {
+	Stage githubPopup;
 	BorderPane rootPane;
 	AnchorPane imgAnchorPane;
 	MenuBar menuBar;
@@ -42,7 +47,9 @@ public class App extends Application {
 	Image image;
 	Slider xSlider;
 	Slider ySlider;
+	TextField textField;
 	int bubbleNum;
+	Label bubbleTextLabel;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -95,6 +102,51 @@ public class App extends Application {
 		imageView.setImage(image);
 	}
 
+	public void showGithubPopup() {
+		Label label = new Label("GitHub page?");
+		label.setFont(new Font("Consolas", 15));
+		label.setLayoutX(75.4);
+		label.setLayoutY(24);
+		label.setTextAlignment(TextAlignment.CENTER);
+
+		Button open = new Button("Goto GitHub");
+		open.setFont(new Font("Consolas", 12));
+		open.setTextAlignment(TextAlignment.CENTER);
+		open.setAlignment(Pos.CENTER);
+		open.setLayoutX(80.6);
+		open.setLayoutY(64);
+		open.setOnAction(e -> openGithubPage());
+
+		AnchorPane pane = new AnchorPane(label, open);
+
+		githubPopup = new Stage();
+		githubPopup.setAlwaysOnTop(true);
+		githubPopup.setResizable(false);
+		githubPopup.setHeight(150);
+		githubPopup.setWidth(250);
+		githubPopup.setTitle("GitHub Popup");
+		githubPopup.setScene(new Scene(pane));
+		githubPopup.show();
+	}
+
+	public void openGithubPage() {
+		try {
+			java.awt.Desktop.getDesktop().browse(
+					java.net.URI.create("https://github.com/Mango-Clark/GSHS-2023-Computer-Science-Project-JavaFX"));
+			githubPopup.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public File openImage(Stage stage) {
+		FileChooser imageChooser = new FileChooser();
+		imageChooser.setTitle("get Image");
+		imageChooser.getExtensionFilters()
+				.add(new ExtensionFilter("그림파일 : Image Files", "*.png", "*.jpg", "*.gif", "*.bmp"));
+		return imageChooser.showOpenDialog(stage);
+	}
+
 	private void initializeBubble() {
 		bubbleView = new ImageView();
 		bubbleView.prefHeight(Region.USE_COMPUTED_SIZE);
@@ -115,6 +167,7 @@ public class App extends Application {
 	private void hideBubble() {
 		bubbleNum = -1;
 		imgAnchorPane.getChildren().remove(bubbleView);
+		imgAnchorPane.getChildren().remove(bubbleTextLabel);
 		return;
 	}
 
@@ -129,14 +182,14 @@ public class App extends Application {
 		bubbleNum = n;
 		bubbleView.setImage(bubbleImage);
 		updateBubbleLayout();
-		imgAnchorPane.getChildren().add(bubbleView);
+		imgAnchorPane.getChildren().addAll(bubbleView, bubbleTextLabel);
 	}
 
 	public void initializeMenuBar(Stage s) {
 		menuItem_Open = new MenuItem("Open");
 		menuItem_Open.setOnAction(event -> {
 			showImage();
-			File sourceFile = AppController.openImage(s);
+			File sourceFile = openImage(s);
 			try {
 				showImage(new FileInputStream(sourceFile));
 			} catch (FileNotFoundException exception) {
@@ -154,7 +207,7 @@ public class App extends Application {
 		menu_File.getItems().addAll(menuItem_Open, menuItem_Save);
 
 		menuItem_GitHub = new MenuItem("GitHub");
-		menuItem_GitHub.setOnAction(e -> AppController.showGithubPopup(s));
+		menuItem_GitHub.setOnAction(e -> showGithubPopup());
 
 		menu_Help = new Menu("Help");
 		menu_Help.getItems().addAll(menuItem_GitHub);
@@ -227,6 +280,14 @@ public class App extends Application {
 		ySliderHBox.setAlignment(Pos.CENTER);
 		ySliderHBox.getChildren().addAll(ySliderLabel, ySlider);
 
+		Label bubbleTextFieldLabel = new Label(" Text ");
+		textField = new TextField();
+		textField.setPromptText("write text for bubble");
+		textField.setOnAction(e -> updateBubbleText());
+		HBox textBox = new HBox();
+		textBox.setSpacing(10);
+		textBox.setAlignment(Pos.CENTER);
+
 		vBox.getChildren().setAll(xSliderHBox, ySliderHBox);
 		return vBox;
 	}
@@ -234,6 +295,10 @@ public class App extends Application {
 	public void updateBubbleLayout() {
 		bubbleView.setLayoutX(xSlider.getValue() * (image.getWidth() - bubbleImage.getWidth()));
 		bubbleView.setLayoutY(ySlider.getValue() * (image.getHeight() - bubbleImage.getHeight()));
+	}
+
+	public void updateBubbleText() {
+		bubbleTextLabel.setText(textField.getText());
 	}
 
 	public static void main(String[] args) {
