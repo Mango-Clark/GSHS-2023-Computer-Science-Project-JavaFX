@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -47,7 +45,7 @@ public class App extends Application {
 	Image image;
 	Slider xSlider;
 	Slider ySlider;
-	TextField textField;
+	TextField bubbleTextField;
 	int bubbleNum;
 	Label bubbleTextLabel;
 
@@ -64,8 +62,6 @@ public class App extends Application {
 		menuBar = new MenuBar();
 
 		imageView = new ImageView();
-		imageView.prefHeight(Region.USE_COMPUTED_SIZE);
-		imageView.prefWidth(Region.USE_COMPUTED_SIZE);
 		imageView.setPreserveRatio(true);
 
 		showImage();
@@ -94,7 +90,7 @@ public class App extends Application {
 
 	private void showImage(InputStream is) {
 		try {
-			image = new Image(is, 700.0, 500.0, true, true);
+			image = new Image(is);
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			System.out.println("NullPointerException");
@@ -157,6 +153,10 @@ public class App extends Application {
 
 	private void toggleBubble(int n) {
 		if (bubbleNum != -1) {
+			if (n == bubbleNum) {
+				hideBubble();
+				return;
+			}
 			hideBubble();
 		}
 		if (n != bubbleNum) {
@@ -181,7 +181,11 @@ public class App extends Application {
 		bubbleImage = new Image(url);
 		bubbleNum = n;
 		bubbleView.setImage(bubbleImage);
+		bubbleTextLabel = new Label("text...");
+		bubbleTextLabel.setFont(new Font("Consolas", 18));
+		bubbleTextLabel.setPrefWidth(150);
 		updateBubbleLayout();
+		updateBubbleText();
 		imgAnchorPane.getChildren().addAll(bubbleView, bubbleTextLabel);
 	}
 
@@ -196,6 +200,8 @@ public class App extends Application {
 				exception.printStackTrace();
 				System.out.println("File not found: " + sourceFile.getAbsolutePath().toString());
 			}
+			updateBubbleLayout();
+			updateBubbleText();
 		});
 
 		menuItem_Save = new MenuItem("Save");
@@ -254,12 +260,7 @@ public class App extends Application {
 		xSliderLabel.setFont(new Font("Consolas", 12));
 		xSlider = new Slider(0.0, 1.0, 0.2);
 		xSlider.setBlockIncrement(0.01);
-		xSlider.valueProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-				updateBubbleLayout();
-			}
-		});
+		xSlider.valueProperty().addListener((observable, oldValue, newValue) -> updateBubbleLayout());
 		HBox xSliderHBox = new HBox();
 		xSliderHBox.setSpacing(10);
 		xSliderHBox.setAlignment(Pos.CENTER);
@@ -269,36 +270,38 @@ public class App extends Application {
 		ySliderLabel.setFont(new Font("Consolas", 12));
 		ySlider = new Slider(0.0, 1.0, 0.2);
 		ySlider.setBlockIncrement(0.01);
-		ySlider.valueProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-				updateBubbleLayout();
-			}
-		});
+		ySlider.valueProperty().addListener((observable, oldValue, newValue) -> updateBubbleLayout());
 		HBox ySliderHBox = new HBox();
 		ySliderHBox.setSpacing(10);
 		ySliderHBox.setAlignment(Pos.CENTER);
 		ySliderHBox.getChildren().addAll(ySliderLabel, ySlider);
 
 		Label bubbleTextFieldLabel = new Label(" Text ");
-		textField = new TextField();
-		textField.setPromptText("write text for bubble");
-		textField.setOnAction(e -> updateBubbleText());
-		HBox textBox = new HBox();
-		textBox.setSpacing(10);
-		textBox.setAlignment(Pos.CENTER);
+		bubbleTextFieldLabel.setFont(new Font("Consolas", 12));
+		bubbleTextField = new TextField();
+		bubbleTextField.setPromptText("text...");
+		bubbleTextField.setFont(new Font("Consolas", 12));
+		bubbleTextField.setPrefWidth(140);
+		bubbleTextField.textProperty().addListener((observable, oldValue, newValue) -> updateBubbleText());
 
-		vBox.getChildren().setAll(xSliderHBox, ySliderHBox);
+		HBox textHBox = new HBox();
+		textHBox.setSpacing(10);
+		textHBox.setAlignment(Pos.CENTER);
+		textHBox.getChildren().addAll(bubbleTextFieldLabel, bubbleTextField);
+
+		vBox.getChildren().setAll(xSliderHBox, ySliderHBox, textHBox);
 		return vBox;
 	}
 
 	public void updateBubbleLayout() {
 		bubbleView.setLayoutX(xSlider.getValue() * (image.getWidth() - bubbleImage.getWidth()));
 		bubbleView.setLayoutY(ySlider.getValue() * (image.getHeight() - bubbleImage.getHeight()));
+		bubbleTextLabel.setLayoutX(xSlider.getValue() * (image.getWidth() - bubbleImage.getWidth()) + 35);
+		bubbleTextLabel.setLayoutY(ySlider.getValue() * (image.getHeight() - bubbleImage.getHeight()) + 40);
 	}
 
 	public void updateBubbleText() {
-		bubbleTextLabel.setText(textField.getText());
+		bubbleTextLabel.setText(bubbleTextField.getText());
 	}
 
 	public static void main(String[] args) {
