@@ -63,6 +63,7 @@ public class AppController implements Initializable {
 
 	public static File openImage(Stage stage) {
 		FileChooser imageChooser = new FileChooser();
+		imageChooser.setTitle("get Image");
 		imageChooser.getExtensionFilters()
 				.add(new ExtensionFilter("그림파일 : Image Files", "*.png", "*.jpg", "*.gif", "*.bmp"));
 		return imageChooser.showOpenDialog(stage);
