@@ -42,8 +42,7 @@ public class App extends Application {
 	Image image;
 	Slider xSlider;
 	Slider ySlider;
-
-	boolean bubbleEnabled;
+	int bubbleNum;
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -62,7 +61,6 @@ public class App extends Application {
 		imageView.prefWidth(Region.USE_COMPUTED_SIZE);
 		imageView.setPreserveRatio(true);
 
-		initializeBubble();
 		showImage();
 		initializeMenuBar(s);
 
@@ -77,6 +75,9 @@ public class App extends Application {
 		rootPane.setLeft(bubbleButtonVBox(s));
 		rootPane.setRight(bubbleAttributeVBox(s));
 		rootPane.setStyle("-fx-background-color: #dddddd");
+
+		initializeBubble();
+
 		return new Scene(rootPane);
 	}
 
@@ -86,7 +87,7 @@ public class App extends Application {
 
 	private void showImage(InputStream is) {
 		try {
-			image = new Image(is, 1000.0, 700.0, true, true);
+			image = new Image(is, 700.0, 500.0, true, true);
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			System.out.println("NullPointerException");
@@ -95,30 +96,24 @@ public class App extends Application {
 	}
 
 	private void initializeBubble() {
-		bubbleEnabled = false;
-		bubbleImage = new Image(new File("./").getAbsolutePath().toString()
-				+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/0.png");
-		bubbleView = new ImageView(bubbleImage);
+		bubbleView = new ImageView();
+		bubbleView.prefHeight(Region.USE_COMPUTED_SIZE);
+		bubbleView.prefWidth(Region.USE_COMPUTED_SIZE);
+		bubbleView.setPreserveRatio(true);
+		showBubble();
 	}
 
-	private void toggleBubble() {
-		if (bubbleEnabled) {
+	private void toggleBubble(int n) {
+		if (bubbleNum != -1) {
 			hideBubble();
-		} else {
-			showBubble();
 		}
-	}
-
-	private void toggleBubble(int bubbleNum) {
-		if (bubbleEnabled) {
-			hideBubble();
-		} else {
-			showBubble(bubbleNum);
+		if (n != bubbleNum) {
+			showBubble(n);
 		}
 	}
 
 	private void hideBubble() {
-		bubbleEnabled = false;
+		bubbleNum = -1;
 		imgAnchorPane.getChildren().remove(bubbleView);
 		return;
 	}
@@ -127,18 +122,11 @@ public class App extends Application {
 		showBubble(0);
 	}
 
-	private void showBubble(int bubbleNum) {
+	private void showBubble(int n) {
 		String url = new File("./").getAbsolutePath().toString()
-				+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/" + bubbleNum + ".png";
-		try {
-			bubbleImage = new Image(url);
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			System.out.println("NullPointerException");
-		}
-		if (bubbleEnabled) {
-		}
-		bubbleEnabled = true;
+				+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/" + n + ".png";
+		bubbleImage = new Image(url);
+		bubbleNum = n;
 		bubbleView.setImage(bubbleImage);
 		updateBubbleLayout();
 		imgAnchorPane.getChildren().add(bubbleView);
@@ -181,14 +169,16 @@ public class App extends Application {
 		vBox.setAlignment(Pos.TOP_CENTER);
 		vBox.setPadding(new javafx.geometry.Insets(10, 10, 10, 10));
 		vBox.setStyle("-fx-background-color: #ffffff;");
-		vBox.getChildren().addAll(bubbleButton(0));
+		for (int i = 0; i < 4; i++) {
+			vBox.getChildren().add(bubbleButton(i));
+		}
 		return vBox;
 	}
 
-	private Button bubbleButton(int bubbleNum) {
+	private Button bubbleButton(int n) {
 		ImageView view = new ImageView(new Image(
 				new File("./").getAbsolutePath().toString()
-						+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/" + bubbleNum + ".png"));
+						+ "/src/main/java/com/mango_clark/speech_bubble/files/bubbles/" + n + ".png"));
 		view.setFitHeight(30);
 		view.setPreserveRatio(true);
 		Button btn = new Button();
@@ -196,7 +186,7 @@ public class App extends Application {
 		btn.setGraphic(view);
 		btn.setContentDisplay(ContentDisplay.TOP);
 
-		btn.setOnAction(e -> toggleBubble(bubbleNum));
+		btn.setOnAction(e -> toggleBubble(n));
 		return btn;
 	}
 
@@ -209,7 +199,7 @@ public class App extends Application {
 
 		Label xSliderLabel = new Label("  X_  ");
 		xSliderLabel.setFont(new Font("Consolas", 12));
-		xSlider = new Slider(-0.05, 1.05, 0.2);
+		xSlider = new Slider(0.0, 1.0, 0.2);
 		xSlider.setBlockIncrement(0.01);
 		xSlider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -224,7 +214,7 @@ public class App extends Application {
 
 		Label ySliderLabel = new Label("  Y_  ");
 		ySliderLabel.setFont(new Font("Consolas", 12));
-		ySlider = new Slider(-0.05, 1.05, 0.2);
+		ySlider = new Slider(0.0, 1.0, 0.2);
 		ySlider.setBlockIncrement(0.01);
 		ySlider.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -262,9 +252,8 @@ public class App extends Application {
 	}
 
 	public void updateBubbleLayout() {
-		bubbleView.setLayoutX(xSlider.getValue() * imageView.getFitWidth());
-		bubbleView.setLayoutY(ySlider.getValue() * imageView.getFitHeight());
-		System.out.println(imageView.getFitWidth() - bubbleImage.getWidth()); // bug
+		bubbleView.setLayoutX(xSlider.getValue() * (image.getWidth() - bubbleImage.getWidth()));
+		bubbleView.setLayoutY(ySlider.getValue() * (image.getHeight() - bubbleImage.getHeight()));
 	}
 
 	public static void main(String[] args) {
