@@ -313,12 +313,13 @@ public class App extends Application {
 	}
 
 	public void saveImage(Stage s) {
-		System.out.println("save");
-		DirectoryChooser directoryChooser = new DirectoryChooser();
+		FileChooser saveFileChooser = new FileChooser();
+		saveFileChooser.setTitle("Save Image");
+		saveFileChooser.getExtensionFilters()
+				.add(new ExtensionFilter("그림파일 : Image Files", "*.png", "*.jpg", "*.gif", "*.bmp"));
 
 		WritableImage image = imgAnchorPane.snapshot(new SnapshotParameters(), null);
-		File file = new File(new File("").getAbsolutePath().toString()
-				+ "/src/main/java/com/mango_clark/speech_bubble/files/save.png");
+		File file = saveFileChooser.showSaveDialog(s);
 
 		try {
 			ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
