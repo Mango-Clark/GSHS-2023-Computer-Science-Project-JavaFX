@@ -4,4 +4,5 @@ open module com.mango_clark.requestfx {
 	requires javafx.fxml;
 	requires javafx.media;
 	requires javafx.graphics;
+	requires javafx.swing;
 }

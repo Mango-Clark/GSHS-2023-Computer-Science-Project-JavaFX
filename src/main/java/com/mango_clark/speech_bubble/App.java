@@ -3,12 +3,16 @@ package com.mango_clark.speech_bubble;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 
 import javafx.application.Application;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -20,6 +24,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -27,14 +32,17 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.embed.swing.SwingFXUtils;
 
 public class App extends Application {
 	Stage githubPopup;
 	BorderPane rootPane;
 	AnchorPane imgAnchorPane;
+	HBox verticalSeparatorHBox;
 	MenuBar menuBar;
 	Menu menu_File, menu_Help;
 	MenuItem menuItem_Open, menuItem_Save;
@@ -70,11 +78,13 @@ public class App extends Application {
 		imgAnchorPane = new AnchorPane();
 		imgAnchorPane.getChildren().setAll(imageView);
 
+		verticalSeparatorHBox = new HBox(new Separator(Orientation.VERTICAL), imgAnchorPane,
+				new Separator(Orientation.VERTICAL));
+
 		rootPane = new BorderPane();
 		rootPane.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 		rootPane.setTop(menuBar);
-		rootPane.setCenter(
-				new HBox(new Separator(Orientation.VERTICAL), imgAnchorPane, new Separator(Orientation.VERTICAL)));
+		rootPane.setCenter(verticalSeparatorHBox);
 		rootPane.setLeft(bubbleButtonVBox(s));
 		rootPane.setRight(bubbleAttributeVBox(s));
 		rootPane.setStyle("-fx-background-color: #dddddd");
@@ -205,9 +215,7 @@ public class App extends Application {
 		});
 
 		menuItem_Save = new MenuItem("Save");
-		menuItem_Save.setOnAction(e -> {
-			System.out.println("Save");
-		});
+		menuItem_Save.setOnAction(e -> saveImage(s));
 
 		menu_File = new Menu("File");
 		menu_File.getItems().addAll(menuItem_Open, menuItem_Save);
@@ -302,6 +310,22 @@ public class App extends Application {
 
 	public void updateBubbleText() {
 		bubbleTextLabel.setText(bubbleTextField.getText());
+	}
+
+	public void saveImage(Stage s) {
+		System.out.println("save");
+		DirectoryChooser directoryChooser = new DirectoryChooser();
+
+		WritableImage image = imgAnchorPane.snapshot(new SnapshotParameters(), null);
+		File file = new File(new File("").getAbsolutePath().toString()
+				+ "/src/main/java/com/mango_clark/speech_bubble/files/save.png");
+
+		try {
+			ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(file.getAbsolutePath());
 	}
 
 	public static void main(String[] args) {
